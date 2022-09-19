@@ -1,0 +1,58 @@
+---
+title: "ANA 515 Assignment 2"
+author: "Dongyoon Lee"
+date: "September 18, 2022"
+output: 
+  html_document:
+    theme:
+      bootswatch: minty
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(knitr)
+library(bslib)
+library(dplyr)
+library(ggplot2)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Data Description
+
+The dataset we will be reviewing today is called the nba-draymond dataset from https://github.com/fivethirtyeight/data/tree/master/nba-draymond. The main statistic that this dataset covers is called the DRAYMOND rating, which stands for Defensive Rating Accounting for Yielding Minimal Openness by Nearest Defender (The acronym definitely feels a bit forced.) In essence, this rating attempts to capture the defensive rating of a nba player for each season by soley looking at how much they were able to reduce the offense of players on the opposing team by contesting and preventing open shots. These calculations were made by calculating first each player's raw DRAYMOND score, which is measured via tracking live/record nba games. Then, the raw rating is adjusted for the number of possesions that the player played to generate a rate statistic. The rating is then adjusted for player position and the league average to get the final DRAYMOND rating. With this data, I believe we will be able to research questions like 'what is the league average DRAYMOND rating and who are the players that fit outside the standard deviation?'. The dataset is saved in a csv flatfile (comma delimiter).
+
+
+## Reading the Data
+
+```{r, echo=TRUE}
+#we use the read_csv function from the dplyr module
+url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/nba-draymond/draymond.csv"
+nba_draymond <- read_csv(url)
+nba_draymond
+```
+
+## Cleaning the Data
+```{r nba_draymond, echo=TRUE}
+nba_draymond <- rename(nba_draymond, year=season)
+starters <- filter(nba_draymond, possessions >= 100)
+```
+
+## Data Characteristics
+
+This dataframe has `r nrow(nba_draymond)` rows and `r ncol(nba_draymond)` columns. Only `r nrow(nba_draymond) - nrow(starters)` have playered more than 100 possesions. The names of the columns and a brief description of each are in the table below:
+
+```{r characteristics, echo=TRUE}
+#this makes a new data.frame called text_tbl with two columns, Names and Description
+text_tbl <- data.frame( 
+  Names = c("year", "player", "possessions", "DRAYMOND"), 
+  Description = c("The NBA season that the NBA player played in", "The name of the NBA player", "The number of possessions the NBA player played during the season", "The NBA player's DRAYMOND rating")
+) 
+text_tbl #prints the table
+```
+
+## Summary Statistics
+```{r summary, echo=TRUE}
+df <- select(starters, year, player, DRAYMOND)
+summary <-summary(df)
+summary
+```
